@@ -7,11 +7,13 @@ let tentativas = 1;
 function exibirTextoNaTela(tag, texto) {
     let element = document.querySelector(tag);
     element.innerHTML = texto;
+    // rsponsiveVoice.speak(texto, 'Brazilian Portuguese Female', {rate:1.2});
+    responsiveVoice.speak(texto, "Brazilian Portuguese Female", {rate: 1.2});
 }
 
 
 function exibirMensagemInicial() {
-    exibirTextoNaTela('h1', 'Jogo do número secreto');
+    exibirTextoNaTela('h1', 'Jogo do número segicreto');
     exibirTextoNaTela('p', 'Escolha um número de 1 a 10');
 }
 exibirMensagemInicial();
