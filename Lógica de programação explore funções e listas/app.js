@@ -1,4 +1,6 @@
-// Lógica de programação: explore funções e listas  
+// Lógica de programação: explore funções e listas
+let listaDeNumerosSorteados = []
+let numeroLimite = 10;
 let numeroSecreto = gererNumeroAleatorio();
 let tentativas = 1;
 
@@ -39,7 +41,19 @@ function verificarChute() {
 
 
 function gererNumeroAleatorio() {
-    return parseInt(Math.random() * 10 +1);
+    let numeroEscolhido = parseInt(Math.random() * numeroLimite +1);
+    let quantidadeDeElementosNaLista = listaDeNumerosSorteados.length;
+
+    if (quantidadeDeElementosNaLista == numeroLimite){
+        listaDeNumerosSorteados = [];
+    }
+
+    if (listaDeNumerosSorteados.includes(numeroEscolhido)) {
+        return gererNumeroAleatorio();
+    } else {
+        listaDeNumerosSorteados.push(numeroEscolhido);
+        return numeroEscolhido;
+    }
 }
 
 
