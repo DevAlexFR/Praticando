@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="db_test.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2155"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="Clientes" custom_title="0" dock_id="1" table="4,8:mainClientes"/><dock_state state="000000ff00000000fd00000001000000020000000000000000fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000012800ffffff000000000000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">PRAGMA foreign_keys = ON;
+
+-- =========================
+-- TABELA: Colaboradores
+-- =========================
+CREATE TABLE Colaboradores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT,
+    departamento TEXT
+);
+
+INSERT INTO Colaboradores (nome, departamento) VALUES
+('Isadora Silva', 'RH'),
+('Isadora Costa', 'Financeiro'),
+('Carlos Mendes', 'TI');
+
+-- =========================
+-- TABELA: Treinamento
+-- =========================
+CREATE TABLE Treinamento (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    curso TEXT,
+    instituicao TEXT
+);
+
+INSERT INTO Treinamento (curso, instituicao) VALUES
+('O poder da mente', 'da Rocha'),
+('O poder da ação', 'da Rocha'),
+('Como realizar sonhos', 'das Neves'),
+('Aprender a realizar projetos', 'Instituto Alpha'),
+('O direito constitucional', 'da Rocha'),
+('O conforto do lar', 'das Neves');
+
+-- =========================
+-- TABELA: HistoricoEmprego
+-- =========================
+CREATE TABLE HistoricoEmprego (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    colaborador_id INTEGER,
+    cargo TEXT,
+    datainicio DATE,
+    datatermino DATE,
+    FOREIGN KEY (colaborador_id) REFERENCES Colaboradores(id)
+);
+
+INSERT INTO HistoricoEmprego (colaborador_id, cargo, datainicio, datatermino) VALUES
+(1, 'Professor', '2018-01-01', '2020-12-31'),
+(1, 'Oftalmologista', '2021-01-01', NULL),
+(2, 'Dermatologista', '2019-03-01', NULL),
+(3, 'Analista', '2020-01-01', '2022-01-01');
+
+-- =========================
+-- TABELA: TabelaFornecedores
+-- =========================
+CREATE TABLE tabelafornecedores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT,
+    país_de_origem TEXT
+);
+
+INSERT INTO tabelafornecedores (nome, país_de_origem) VALUES
+('Fornecedor A', 'China'),
+('Fornecedor B', 'Brasil'),
+('Fornecedor C', 'China');
+
+-- =========================
+-- TABELA: TabelaPedidos
+-- =========================
+CREATE TABLE tabelapedidos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cliente TEXT
+);
+
+INSERT INTO tabelapedidos (cliente) VALUES
+('Maria'),
+('João'),
+('Maria'),
+('Carlos');
+
+-- =========================
+-- TABELAS DE VENDAS
+-- =========================
+CREATE TABLE categorias (
+    id_categoria INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_categoria TEXT
+);
+
+CREATE TABLE produtos (
+    id_produto INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT,
+    categoria_id INTEGER,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id_categoria)
+);
+
+CREATE TABLE vendas (
+    id_venda INTEGER PRIMARY KEY AUTOINCREMENT,
+    data DATE
+);
+
+CREATE TABLE itens_venda (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    venda_id INTEGER,
+    produto_id INTEGER,
+    FOREIGN KEY (venda_id) REFERENCES vendas(id_venda),
+    FOREIGN KEY (produto_id) REFERENCES produtos(id_produto)
+);
+
+INSERT INTO categorias (nome_categoria) VALUES
+('Eletrônicos'),
+('Roupas'),
+('Livros');
+
+INSERT INTO produtos (nome, categoria_id) VALUES
+('Celular', 1),
+('Notebook', 1),
+('Camisa', 2),
+('Livro SQL', 3);
+
+INSERT INTO vendas (data) VALUES
+('2024-01-01'),
+('2024-01-02');
+
+INSERT INTO itens_venda (venda_id, produto_id) VALUES
+(1, 1),
+(1, 2),
+(2, 4),
+(2, 4),
+(2, 3);
+
+-- =========================
+-- SISTEMA DE PEDIDOS
+-- =========================
+CREATE TABLE Clientes (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nome TEXT
+);
+
+CREATE TABLE Pedidos (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_Cliente INTEGER,
+    DataHoraPedido DATETIME,
+    FOREIGN KEY (ID_Cliente) REFERENCES Clientes(ID)
+);
+
+CREATE TABLE ItensPedido (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_Pedido INTEGER,
+    Quantidade INTEGER,
+    PrecoUnitario REAL,
+    FOREIGN KEY (ID_Pedido) REFERENCES Pedidos(ID)
+);
+
+CREATE TABLE FaturamentoDiario (
+    Dia DATE,
+    FaturamentoTotal REAL
+);
+
+INSERT INTO Clientes (Nome) VALUES
+('Ana'),
+('Bruno');
+
+INSERT INTO Pedidos (ID_Cliente, DataHoraPedido) VALUES
+(1, '2024-02-01 10:00:00'),
+(2, '2024-02-01 15:00:00');
+
+INSERT INTO ItensPedido (ID_Pedido, Quantidade, PrecoUnitario) VALUES
+(1, 2, 50),
+(1, 1, 100),
+(2, 3, 30);
+
+-- =========================
+-- VIEW
+-- =========================
+CREATE VIEW ViewTotalPorPedido AS
+SELECT 
+    P.ID AS ID_Pedido,
+    P.DataHoraPedido,
+    C.Nome AS NomeCliente,
+    SUM(IP.Quantidade * IP.PrecoUnitario) AS TotalPorPedido
+FROM Pedidos AS P
+JOIN Clientes AS C ON P.ID_Cliente = C.ID
+JOIN ItensPedido AS IP ON P.ID = IP.ID_Pedido
+GROUP BY P.ID, P.DataHoraPedido, C.Nome;
+
+-- =========================
+-- TRIGGER
+-- =========================
+CREATE TRIGGER CalculoFaturamentoDiario
+AFTER INSERT ON ItensPedido
+FOR EACH ROW
+BEGIN
+    DELETE FROM FaturamentoDiario;
+    INSERT INTO FaturamentoDiario (Dia, FaturamentoTotal)
+    SELECT
+        DATE(P.DataHoraPedido),
+        SUM(IP.Quantidade * IP.PrecoUnitario)
+    FROM Pedidos P
+    JOIN ItensPedido IP ON P.ID = IP.ID_Pedido
+    GROUP BY DATE(P.DataHoraPedido);
+END;
+</sql><current_tab id="0"/></tab_sql></sqlb_project>
